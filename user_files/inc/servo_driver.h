@@ -3,30 +3,7 @@
 #ifndef SERVO_DRIVER_H
 #define SERVO_DRIVER_H
 
-#include "main.h"
-
-#define ONE_BYTE								1
-#define TWO_BYTES								2
-
-typedef enum
-{
-	SERVO_PWM_0_DEGREES = 205,
-	SERVO_PWM_90_DEGREES = 307,
-	SERVO_PWM_180_DEGREES = 410
-
-} servo_pwm_preset_t;
-
-typedef enum
-{
-	SERVO_0,
-	SERVO_1,
-	SERVO_2,
-	SERVO_3,
-	SERVO_4,
-	SERVO_5,
-	SERVO_6,
-	SERVO_7
-} servo_channels_t;
+#include "stm32f4xx_hal.h"
 
 /*
  * Servo driver used: PCA9685
@@ -40,23 +17,61 @@ typedef enum
 #define SERVO_DRIVER_I2C_TIMEOUT				1000
 #define SERVO_DRIVER_ON							1
 #define SERVO_DRIVER_OFF						0
+#define SERVO_NUM_OF_SERVOS						6
+#define SERVO_CHANNEL_0							0
+#define SERVO_CHANNEL_1							1
+#define SERVO_CHANNEL_2							2
+#define SERVO_CHANNEL_3							3
+#define SERVO_CHANNEL_4							4
+#define SERVO_CHANNEL_5							5
+#define SERVO_LEFT_SHOULDER_MIDPOINT_TICK		270
+#define SERVO_GRIPPER_OPEN_TICK					540
+#define SERVO_GRIPPER_CLOSE_TICK				120
 
 /* Servo Driver Control Registers */
 #define SERVO_DRIVER_MODE1_REG_ADDR				0x00
 #define SERVO_DRIVER_PRE_SCALE_REG_ADDR			0xFE
-#define SERVO_DRIVER_PWM0_ON_L					0x06
-#define SERVO_DRIVER_PWM0_ON_H					0x07
-#define SERVO_DRIVER_PWM0_OFF_L					0x08
-#define SERVO_DRIVER_PWM0_OFF_H					0x09
+
 
 /* Servo Motor */
 #define SERVO_MOTOR_FREQUENCY_HZ				50
+#define SERVO_GENERAL_0_DEGREES_TICK			80
+#define SERVO_GENERAL_90_DEGREES_TICK			280
+#define SERVO_GENERAL_180_DEGREES_TICK			560
+
+typedef enum
+{
+	CH0_LEFT_SHOULDER 		= 0,
+	CH1_RIGHT_SHOULDER 		= 1,
+	CH2_ELBOW 				= 2,
+	CH3_WRIST 				= 3,
+	CH4_GRIPPER_ROTATOR		= 4,
+	CH5_GRIPPER 			= 5
+} servo_part_channel_num_t;
+
+typedef struct
+{
+	//Servo Channel Information
+	const servo_part_channel_num_t channel;			// Channel numbers 0-15
+
+	// Servo range (in ticks)
+	const uint16_t min_tick;		// Servo tick num for 0 degrees
+	const uint16_t max_tick;		// Servo tick num for 180 degrees
+	const uint16_t mid_point_tick;	// Servo tick num for mid point
+
+	// Servo position
+	uint16_t current_tick;			// Current servo tick, must be between min_tick and max_tick
+
+} servo_config_t;
+
+
+extern servo_config_t servos[SERVO_NUM_OF_SERVOS];
 
 
 
 /* Function Declarations */
 void servo_driver_init(I2C_HandleTypeDef *hi2c);
-void servo_set_pwm(servo_channels_t channel, servo_pwm_preset_t servo_angle);
+void servo_set_pwm(servo_config_t servo, uint16_t servo_tick);
 void servo_driver_set_prescale(uint16_t output_freq);
 void servo_driver_sleep();
 void servo_driver_wakeup();

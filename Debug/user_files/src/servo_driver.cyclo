@@ -1,0 +1,5 @@
+../user_files/src/servo_driver.c:78:6:servo_driver_init	1
+../user_files/src/servo_driver.c:99:6:servo_set_pwm	1
+../user_files/src/servo_driver.c:122:6:servo_driver_set_prescale	1
+../user_files/src/servo_driver.c:130:6:servo_driver_sleep	1
+../user_files/src/servo_driver.c:144:6:servo_driver_wakeup	1
