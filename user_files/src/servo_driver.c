@@ -45,7 +45,7 @@ servo_config_t servos[SERVO_NUM_OF_SERVOS] = {
 			.min_tick = SERVO_GENERAL_0_DEGREES_TICK,
 			.max_tick = SERVO_GENERAL_180_DEGREES_TICK,
 			.mid_point_tick = SERVO_GENERAL_90_DEGREES_TICK,
-			.current_tick = SERVO_GENERAL_90_DEGREES_TICK
+			.current_tick = SERVO_GENERAL_180_DEGREES_TICK
 	},
 
 	{
@@ -90,18 +90,37 @@ void servo_driver_init(I2C_HandleTypeDef *hi2c)
 	servo_driver_wakeup();
 	HAL_Delay(1);
 
+
+	//Configure shoulders to default position
+	servo_set_pwm(&servos[CH0_LEFT_SHOULDER], servos[CH0_LEFT_SHOULDER].current_tick);
+	servo_set_pwm(&servos[CH1_RIGHT_SHOULDER], servos[CH1_RIGHT_SHOULDER].current_tick);
+
+	//Configure elbow to default position
+	servo_set_pwm(&servos[CH2_ELBOW], servos[CH2_ELBOW].current_tick);
+
+	//Configure wrist to default position
+	servo_set_pwm(&servos[CH3_WRIST], servos[CH3_WRIST].current_tick);
+
+	//Configure gripper rotation to default position
+	servo_set_pwm(&servos[CH4_GRIPPER_ROTATOR], servos[CH4_GRIPPER_ROTATOR].current_tick);
+
+	//Configure gripper to default position
+	servo_set_pwm(&servos[CH5_GRIPPER], servos[CH5_GRIPPER].current_tick);
 }
 
 /* 	 PCA9685 PWM channels have 4096 steps.
 	 on_l and on_h set when the signal goes HIGH; off_l and off_h set when it goes LOW.
 	 For our servos, we always start HIGH immediately (on_l = on_h = 0),
 	 and off_l/off_h are set according to servo_tick to control the servo position. */
-void servo_set_pwm(servo_config_t servo, uint16_t servo_tick)
+void servo_set_pwm(servo_config_t *servo, uint16_t servo_tick)
 {
 	uint8_t pwm_low_step = 0;
 	uint8_t pwm_high_step = 0;
 
-	const servo_channel_registers_t servo_regs = servo_register_map[servo.channel];
+	const servo_channel_registers_t servo_regs = servo_register_map[servo->channel];
+
+	//Ensure servo is set within servo motor tick boundary
+	if (servo_tick > servo->max_tick || servo_tick < servo->min_tick) { return; }
 
 	//Channel PWM set to ON (HIGH) right immediately (i.e. on_l = on_h = 0)
 	HAL_I2C_Mem_Write(servo_i2c_handle, SERVO_DRIVER_I2C_ADDR << 1, servo_regs.on_l, 1, &pwm_low_step, 1, SERVO_DRIVER_I2C_TIMEOUT);
@@ -112,6 +131,9 @@ void servo_set_pwm(servo_config_t servo, uint16_t servo_tick)
 	pwm_high_step = (uint8_t)(servo_tick >> 8);
 	HAL_I2C_Mem_Write(servo_i2c_handle, SERVO_DRIVER_I2C_ADDR << 1, servo_regs.off_l, 1, &pwm_low_step, 1, SERVO_DRIVER_I2C_TIMEOUT);
 	HAL_I2C_Mem_Write(servo_i2c_handle, SERVO_DRIVER_I2C_ADDR << 1, servo_regs.off_h, 1, &pwm_high_step, 1, SERVO_DRIVER_I2C_TIMEOUT);
+
+
+	servo->current_tick = servo_tick;
 }
 
 /**

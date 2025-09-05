@@ -103,9 +103,70 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  //Gripper Button
+	  if (HAL_GPIO_ReadPin(GRIPPER_BTN_GPIO_Port, GRIPPER_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  if (servos[CH5_GRIPPER].current_tick == SERVO_GRIPPER_CLOSE_TICK)
+		  {
+			  servo_set_pwm(&servos[CH5_GRIPPER], SERVO_GRIPPER_OPEN_TICK);
+		  }
+		  else
+		  {
+			  servo_set_pwm(&servos[CH5_GRIPPER], SERVO_GRIPPER_CLOSE_TICK);
+		  }
+	  }
+
+	  //Wrist up and down Buttons
+	  if (HAL_GPIO_ReadPin(WRIST_MINUS_BTN_GPIO_Port, WRIST_MINUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH3_WRIST], servos[CH3_WRIST].current_tick - 10);
+	  }
+	  else if (HAL_GPIO_ReadPin(WRIST_PLUS_BTN_GPIO_Port, WRIST_PLUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH3_WRIST], servos[CH3_WRIST].current_tick + 10);
+	  }
+
+	  //Wrist rotation buttons
+	  if (HAL_GPIO_ReadPin(WRIST_ROTATE_MINUS_BTN_GPIO_Port, WRIST_ROTATE_MINUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH4_GRIPPER_ROTATOR], servos[CH4_GRIPPER_ROTATOR].current_tick - 10);
+	  }
+	  else if (HAL_GPIO_ReadPin(WRIST_ROTATE_PLUS_BTN_GPIO_Port, WRIST_ROTATE_PLUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH4_GRIPPER_ROTATOR], servos[CH4_GRIPPER_ROTATOR].current_tick + 10);
+	  }
+
+	  //Elbow rotation buttons
+	  if (HAL_GPIO_ReadPin(ELBOW_MINUS_BTN_GPIO_Port, ELBOW_MINUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH2_ELBOW], servos[CH2_ELBOW].current_tick + 10);
+	  }
+	  else if (HAL_GPIO_ReadPin(ELBOW_PLUS_BTN_GPIO_Port, ELBOW_PLUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH2_ELBOW], servos[CH2_ELBOW].current_tick - 10);
+	  }
+
+	  //Shoulder rotation buttons
+	  if (HAL_GPIO_ReadPin(SHOULDER_MINUS_BTN_GPIO_Port, SHOULDER_MINUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH1_RIGHT_SHOULDER], servos[CH1_RIGHT_SHOULDER].current_tick - 10);
+		  servo_set_pwm(&servos[CH0_LEFT_SHOULDER], servos[CH0_LEFT_SHOULDER].current_tick + 10);
+	  }
+	  else if (HAL_GPIO_ReadPin(SHOULDER_PLUS_BTN_GPIO_Port, SHOULDER_PLUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  servo_set_pwm(&servos[CH1_RIGHT_SHOULDER], servos[CH1_RIGHT_SHOULDER].current_tick + 10);
+		  servo_set_pwm(&servos[CH0_LEFT_SHOULDER], servos[CH0_LEFT_SHOULDER].current_tick - 10);
+
+	  }
+
+	  //Elbow up and down buttons
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  HAL_Delay(100);
+
   }
   /* USER CODE END 3 */
 }
@@ -264,6 +325,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : WRIST_PLUS_BTN_Pin WRIST_ROTATE_MINUS_BTN_Pin WRIST_ROTATE_PLUS_BTN_Pin GRIPPER_BTN_Pin */
+  GPIO_InitStruct.Pin = WRIST_PLUS_BTN_Pin|WRIST_ROTATE_MINUS_BTN_Pin|WRIST_ROTATE_PLUS_BTN_Pin|GRIPPER_BTN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SHOULDER_MINUS_BTN_Pin SHOULDER_PLUS_BTN_Pin WRIST_MINUS_BTN_Pin */
+  GPIO_InitStruct.Pin = SHOULDER_MINUS_BTN_Pin|SHOULDER_PLUS_BTN_Pin|WRIST_MINUS_BTN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ELBOW_MINUS_BTN_Pin ELBOW_PLUS_BTN_Pin */
+  GPIO_InitStruct.Pin = ELBOW_MINUS_BTN_Pin|ELBOW_PLUS_BTN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

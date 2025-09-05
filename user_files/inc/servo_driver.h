@@ -25,8 +25,8 @@
 #define SERVO_CHANNEL_4							4
 #define SERVO_CHANNEL_5							5
 #define SERVO_LEFT_SHOULDER_MIDPOINT_TICK		270
-#define SERVO_GRIPPER_OPEN_TICK					540
-#define SERVO_GRIPPER_CLOSE_TICK				120
+#define SERVO_GRIPPER_OPEN_TICK					520
+#define SERVO_GRIPPER_CLOSE_TICK				100
 
 /* Servo Driver Control Registers */
 #define SERVO_DRIVER_MODE1_REG_ADDR				0x00
@@ -71,7 +71,7 @@ extern servo_config_t servos[SERVO_NUM_OF_SERVOS];
 
 /* Function Declarations */
 void servo_driver_init(I2C_HandleTypeDef *hi2c);
-void servo_set_pwm(servo_config_t servo, uint16_t servo_tick);
+void servo_set_pwm(servo_config_t *servo, uint16_t servo_tick);
 void servo_driver_set_prescale(uint16_t output_freq);
 void servo_driver_sleep();
 void servo_driver_wakeup();

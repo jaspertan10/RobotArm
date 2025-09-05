@@ -1,5 +1,5 @@
 ../user_files/src/servo_driver.c:78:6:servo_driver_init	16	static
-../user_files/src/servo_driver.c:99:6:servo_set_pwm	56	static
-../user_files/src/servo_driver.c:122:6:servo_driver_set_prescale	40	static
-../user_files/src/servo_driver.c:130:6:servo_driver_sleep	32	static
-../user_files/src/servo_driver.c:144:6:servo_driver_wakeup	32	static
+../user_files/src/servo_driver.c:115:6:servo_set_pwm	40	static
+../user_files/src/servo_driver.c:144:6:servo_driver_set_prescale	40	static
+../user_files/src/servo_driver.c:152:6:servo_driver_sleep	32	static
+../user_files/src/servo_driver.c:166:6:servo_driver_wakeup	32	static
