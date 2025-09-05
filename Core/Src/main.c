@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "servo_driver.h"
+#include "stepper_driver.h"
 
 /* USER CODE END Includes */
 
@@ -43,6 +44,8 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c2;
 
+TIM_HandleTypeDef htim10;
+
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -54,6 +57,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_TIM10_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -94,6 +98,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_I2C2_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
   servo_driver_init(&hi2c2);
 
@@ -159,7 +164,18 @@ int main(void)
 
 	  }
 
-	  //Elbow up and down buttons
+	  //Base rotation buttons
+
+	  if (HAL_GPIO_ReadPin(BASE_MINUS_BTN_GPIO_Port, BASE_MINUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  HAL_GPIO_WritePin(DIR_PIN_GPIO_Port, DIR_PIN_Pin, GPIO_PIN_SET);
+		  HAL_TIM_OC_Start_IT(&htim10, TIM_CHANNEL_1);
+	  }
+	  else if (HAL_GPIO_ReadPin(BASE_PLUS_BTN_GPIO_Port, BASE_PLUS_BTN_Pin) == GPIO_PIN_RESET)
+	  {
+		  HAL_GPIO_WritePin(DIR_PIN_GPIO_Port, DIR_PIN_Pin, GPIO_PIN_RESET);
+		  HAL_TIM_OC_Start_IT(&htim10, TIM_CHANNEL_1);
+	  }
 
 
     /* USER CODE END WHILE */
@@ -260,6 +276,52 @@ static void MX_I2C2_Init(void)
 }
 
 /**
+  * @brief TIM10 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM10_Init(void)
+{
+
+  /* USER CODE BEGIN TIM10_Init 0 */
+
+  /* USER CODE END TIM10_Init 0 */
+
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM10_Init 1 */
+
+  /* USER CODE END TIM10_Init 1 */
+  htim10.Instance = TIM10;
+  htim10.Init.Prescaler = 180-1;
+  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim10.Init.Period = 2000-1;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_OC_Init(&htim10) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_OC_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM10_Init 2 */
+
+  /* USER CODE END TIM10_Init 2 */
+  HAL_TIM_MspPostInit(&htim10);
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -313,6 +375,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(DIR_PIN_GPIO_Port, DIR_PIN_Pin, GPIO_PIN_SET);
+
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
@@ -332,17 +397,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SHOULDER_MINUS_BTN_Pin SHOULDER_PLUS_BTN_Pin WRIST_MINUS_BTN_Pin */
-  GPIO_InitStruct.Pin = SHOULDER_MINUS_BTN_Pin|SHOULDER_PLUS_BTN_Pin|WRIST_MINUS_BTN_Pin;
+  /*Configure GPIO pins : SHOULDER_MINUS_BTN_Pin SHOULDER_PLUS_BTN_Pin BASE_PLUS_BTN_Pin WRIST_MINUS_BTN_Pin */
+  GPIO_InitStruct.Pin = SHOULDER_MINUS_BTN_Pin|SHOULDER_PLUS_BTN_Pin|BASE_PLUS_BTN_Pin|WRIST_MINUS_BTN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ELBOW_MINUS_BTN_Pin ELBOW_PLUS_BTN_Pin */
-  GPIO_InitStruct.Pin = ELBOW_MINUS_BTN_Pin|ELBOW_PLUS_BTN_Pin;
+  /*Configure GPIO pins : BASE_MINUS_BTN_Pin ELBOW_MINUS_BTN_Pin ELBOW_PLUS_BTN_Pin */
+  GPIO_InitStruct.Pin = BASE_MINUS_BTN_Pin|ELBOW_MINUS_BTN_Pin|ELBOW_PLUS_BTN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : DIR_PIN_Pin */
+  GPIO_InitStruct.Pin = DIR_PIN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(DIR_PIN_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

@@ -1,0 +1,2 @@
+../user_files/src/stepper_driver.c:7:6:stepper_set_direction	16	static
+../user_files/src/stepper_driver.c:19:6:HAL_TIM_OC_DelayElapsedCallback	16	static

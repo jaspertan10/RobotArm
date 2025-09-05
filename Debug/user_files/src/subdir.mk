@@ -5,13 +5,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../user_files/src/servo_driver.c 
+../user_files/src/servo_driver.c \
+../user_files/src/stepper_driver.c 
 
 OBJS += \
-./user_files/src/servo_driver.o 
+./user_files/src/servo_driver.o \
+./user_files/src/stepper_driver.o 
 
 C_DEPS += \
-./user_files/src/servo_driver.d 
+./user_files/src/servo_driver.d \
+./user_files/src/stepper_driver.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +24,7 @@ user_files/src/%.o user_files/src/%.su user_files/src/%.cyclo: ../user_files/src
 clean: clean-user_files-2f-src
 
 clean-user_files-2f-src:
-	-$(RM) ./user_files/src/servo_driver.cyclo ./user_files/src/servo_driver.d ./user_files/src/servo_driver.o ./user_files/src/servo_driver.su
+	-$(RM) ./user_files/src/servo_driver.cyclo ./user_files/src/servo_driver.d ./user_files/src/servo_driver.o ./user_files/src/servo_driver.su ./user_files/src/stepper_driver.cyclo ./user_files/src/stepper_driver.d ./user_files/src/stepper_driver.o ./user_files/src/stepper_driver.su
 
 .PHONY: clean-user_files-2f-src
 

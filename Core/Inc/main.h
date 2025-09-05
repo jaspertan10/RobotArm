@@ -49,6 +49,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -79,6 +81,8 @@ void Error_Handler(void);
 #define WRIST_ROTATE_PLUS_BTN_GPIO_Port GPIOC
 #define GRIPPER_BTN_Pin GPIO_PIN_9
 #define GRIPPER_BTN_GPIO_Port GPIOC
+#define BASE_MINUS_BTN_Pin GPIO_PIN_10
+#define BASE_MINUS_BTN_GPIO_Port GPIOA
 #define ELBOW_MINUS_BTN_Pin GPIO_PIN_11
 #define ELBOW_MINUS_BTN_GPIO_Port GPIOA
 #define ELBOW_PLUS_BTN_Pin GPIO_PIN_12
@@ -87,10 +91,16 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define DIR_PIN_Pin GPIO_PIN_10
+#define DIR_PIN_GPIO_Port GPIOC
 #define PCA9685_I2C_SDA_Pin GPIO_PIN_12
 #define PCA9685_I2C_SDA_GPIO_Port GPIOC
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
+#define BASE_PLUS_BTN_Pin GPIO_PIN_5
+#define BASE_PLUS_BTN_GPIO_Port GPIOB
+#define TIM10_STEP_PIN_Pin GPIO_PIN_8
+#define TIM10_STEP_PIN_GPIO_Port GPIOB
 #define WRIST_MINUS_BTN_Pin GPIO_PIN_9
 #define WRIST_MINUS_BTN_GPIO_Port GPIOB
 
